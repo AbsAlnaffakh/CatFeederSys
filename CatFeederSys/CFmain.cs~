@@ -1,0 +1,229 @@
+using System;
+using System.IO;
+using System.Diagnostics;
+
+
+namespace CatFeederSys
+{
+	class CatFeederMain
+	{
+		static void Main()
+		{
+		   //set time here static
+
+		   //start of by reading variables for meal dispence
+		   DateTime TimeVal = new DateTime();//to store time values and to get the time now
+		   TimeVal = DateTime.Now;
+		   
+                   int CatCalls = 0; // counts the number of times a call has been made out
+		   
+		   string Meal1Hours = ""; // first meal
+		   string Meal1Minute = ""; // first meal
+                   string Meal2Hours = ""; // second meal
+		   string Meal2Minute = ""; // second meal
+
+		   string OwnerEmail = ""; //saves the users Email
+
+		  
+		   // these lines should be removed when decided upon the file location
+		   /*Meal1Hours = ReadFile(1); // time for meal 1 is in 1st line
+		   Meal1Minute = ReadFile(2); // time for meal 1 is in 1st line
+		   Meal2Hours = ReadFile(3); // time for meal 2 is in 2nd line
+		   Meal2Minute = ReadFile(4); // time for meal 2 is in 2nd line*/
+
+		   while(true) // an infinite loop that continues to execute
+		   {
+			// this function checls whether the time now is when a meal should be released
+			/*if ((ReleaseMeal( Meal1Hours, Meal1Minute, TimeVal) == true) || (ReleaseMeal( Meal1Hours, Meal1Minute, TimeVal) == true ))
+			{
+			   OpenServo(); //controls the servo motors in order to release the meal
+			   PlayAudio(); // call the cat over for some food
+			   CatCalls =+1; // cat called once
+			   //Updatedisplay(); // yet to decide upon contents
+			}*/
+
+		  	realTime= DateTime.Now;
+		   	if (realTime.Second  == TimeVal.Second + 10){ // should Be Compared Agains Meal2	
+			CloseServo();		   
+		   	}
+
+			/*(CheckFoodAfterIntegrals(Meal1Hours, Meal1Minute, TimeVal, CatCalls == true))
+			{
+			   // should check for food here then play audio depnding if the food is consumed or not
+			   // as in read from the weight sensor here
+			   // if the food is eaten then we should email the owner and reset counter
+		           // if the food is not eaten then increment counter and call to the cat again
+			   PlayAudio(); // call out to the cat again
+			   CatCalls =+1; 
+			}
+			
+
+			(CheckFoodAfterIntegrals(Meal2Hours, Meal2Minute, TimeVal, CatCalls == true))
+			{
+			   PlayAudio(); // call out to the cat again
+			   CatCalls =+1; 
+			}*/
+
+			if (CatCalls == 6)
+			{
+			  //inform the owner by email that food is not eaten	
+			  CatCalls = 0; //Reset counter
+			}
+			
+
+			// upload file to the arduino and wait for weight sensor respond
+			// if the repond is positive send then send an email with relevant info.
+			// if its negative negative repeat the process over five min integrals
+			// if no respond is received then
+			// dont forget to reset the counter when food is dispenced		  
+			
+		   }
+
+		   //Console.WriteLine(ExecuteCommandLineWithReturn("cd ~/Desktop; ./HelloWorld.exe"));		  
+		   //if (ReleaseMeal( Meal1Hours, Meal1Minute, TimeVal) == true) { Console.WriteLine(Meal1Hours); }; 
+		   //ExecuteCommandLine( "mkdir /home/aboudi/Desktop/testfolder");
+		   //Console.WriteLine(TimeVal.TimeOfDay);
+		   //Console.WriteLine(TimeVal.Hour);		   
+                   //Console.WriteLine(Meal1);
+		   //OpenCloseServo();
+		   
+		}
+
+                /*functions still required
+		1. A function that updates date and time from the internet.
+		2. A function That loads a programme to the arduino IDE and returns a value.
+		*/
+
+		//used as part of checking whether food is consumed or not (needs testing)
+		static bool CheckFoodAfterIntegrals(string hours, string minutes, DateTime curr, int CatCalls)
+		{
+		  int h2i = Int32.Parse(hours);
+                  int m2i = Int32.Parse(minutes);
+		  
+		  //TRY TO ADD BY TEN RATHER THAN MULTIPLY
+		  if((h2i == curr.Hour) && (CatCalls * 10 == curr.Minute))
+		  {
+		     return true;
+		  }
+
+		  return false;
+
+		}
+
+		//executes all function required to release a meal (tested)
+		static bool ReleaseMeal(string hours, string minutes, DateTime curr)
+		{
+		  int h2i = Int32.Parse(hours);
+                  int m2i = Int32.Parse(minutes); 
+
+		if((h2i == curr.Hour) && (m2i == curr.Minute))
+		  {
+		     return true;
+		  }
+
+		  return false;
+		}
+
+	        //used to compare times in file to time now
+
+		//used to execute bash/shell commands (tested)
+		static void ExecuteCommandLine(string command)
+		{
+		  Process proc = new System.Diagnostics.Process();
+		  proc.StartInfo.FileName= "/bin/bash";
+		  proc.StartInfo.Arguments= " -c \" " + command +" \"" ; 
+	          proc.StartInfo.UseShellExecute =false;
+		  proc.StartInfo.RedirectStandardOutput= true;
+		  //processes.Add(proc);
+		  //processes.Exited += (s, e) => { processes.Remove(proc); proc.Dispose(); };// waits for a process to exit then removes it
+		  proc.Start();
+		}
+
+		//List<Process> processes = new List<Process>();// a list of processes to keep track of the ones running
+
+		
+		//Execute a bash/shell command and return a string
+		static string ExecuteCommandLineWithReturn(string command)
+		{
+		  string ReturnedValue = "";
+		  //using(Process proc = new System.Diagnostics.Process())
+		  //{
+			  Process proc = new System.Diagnostics.Process();
+			  proc.StartInfo.FileName= "/bin/bash";
+			  proc.StartInfo.Arguments= " -c \" " + command +" \"" ; 
+			  proc.StartInfo.UseShellExecute =false;
+			  proc.StartInfo.RedirectStandardOutput= true;
+			  proc.Start();
+			  ReturnedValue = proc.StandardOutput.ReadToEnd();//
+			  proc.WaitForExit();// wait unitl the process finishes doint whatever its doing
+		  //}
+		  return ReturnedValue;
+		}
+		
+
+		//used to control the servo motor (tested)
+		static void OpenCloseServo()
+		{
+		   // use execute command line here to execute the file
+		   ExecuteCommandLine("cd /home/user/CatFeederSys/; ./a.out");
+		}
+
+
+		//used to control the servo motor
+		static void OpenServo()
+		{
+		   ExecuteCommandLine( "cd /home/aboudi/Desktop/ServoControls; ./OpenServo;");
+		   // Change Directory
+		}
+
+		//used to control the servo motor
+		static void CloseServo()
+		{
+		   ExecuteCommandLine( "cd /home/aboudi/Desktop/ServoControls; ./CloseServo;");
+		   // Change Directory
+		}
+		
+
+		// reads from the stated line (tested)
+		static string ReadFile(int LineNum)
+		{
+		  int counter = 0 ;
+		  string line;
+    
+		  System.IO.StreamReader file = 
+		  new System.IO.StreamReader(@"/home/aboudi/Desktop/file.txt");  // change this
+		
+		  while((line=file.ReadLine()) !=null)
+		  {
+		    counter++;
+		    if (counter == LineNum)
+                       {   break; }
+		  }		
+		
+		file.Close();
+		return line;          		
+
+		}
+		
+
+		//To play a recording of the owners voice
+		static void PlayAudio()
+		{
+		  // execute this in the command line mplayer /var/www/beep-01a.wav
+		  ExecuteCommandLine("mplayer /var/www/beep-01a.wav");
+		}
+
+		//To send the display information
+		static void Updatedisplay(string[] DisplayData)// meal number/ next meal time
+		{
+
+		}
+
+		// yet to decide on call and arguments
+	        static void SendEmail() // time now, 
+		{
+
+		}
+
+	}
+}
